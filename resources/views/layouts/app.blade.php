@@ -2,7 +2,6 @@
 <html lang="id">
 
 <head>
-    {{-- Gunakan simple pagination agar tidak butuh Tailwind --}}
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@yield('title', 'GameHub') | GameHub</title>
@@ -13,17 +12,20 @@
     <link rel="stylesheet" href="{{ asset('css/app.css') }}">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     @stack('styles')
-</head> 
+</head>
 
 <body>
 
     {{-- Navbar --}}
     <nav class="navbar">
         <div class="container nav-inner">
+
+            {{-- Logo --}}
             <a href="{{ route('home') }}" class="nav-logo">
                 <i class="fa-solid fa-gamepad"></i> GameHub
             </a>
 
+            {{-- Nav Links --}}
             <div class="nav-links">
                 <a href="{{ route('games.index') }}" class="nav-link {{ request()->routeIs('games.*') ? 'active' : '' }}">
                     <i class="fa-solid fa-store"></i> Store
@@ -37,60 +39,72 @@
                     <i class="fa-solid fa-users"></i> Community
                 </a>
 
-                {{-- ✅ AJAX Live Search --}}
+                {{-- AJAX Live Search --}}
                 <div style="position:relative;" id="search-wrapper">
                     <div style="display:flex;align-items:center;background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:0.35rem 0.75rem;gap:0.5rem;">
                         <i class="fa-solid fa-magnifying-glass" style="color:var(--text-muted);font-size:0.85rem;"></i>
                         <input type="text" id="live-search" placeholder="Cari game..."
-                            style="background:transparent;border:none;outline:none;color:var(--text-primary);font-family:var(--font-body);font-size:0.875rem;width:180px;">
+                               style="background:transparent;border:none;outline:none;color:var(--text-primary);font-family:var(--font-body);font-size:0.875rem;width:180px;">
                     </div>
-                    {{-- Dropdown Hasil --}}
                     <div id="search-results"
-                        style="display:none;position:absolute;top:calc(100% + 8px);left:0;right:0;min-width:280px;background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-lg);z-index:9999;overflow:hidden;box-shadow:var(--shadow);">
+                         style="display:none;position:absolute;top:calc(100% + 8px);left:0;right:0;min-width:280px;background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-lg);z-index:9999;overflow:hidden;box-shadow:var(--shadow);">
                     </div>
                 </div>
-        </div>
+            </div>{{-- ✅ Tutup nav-links di sini --}}
 
-        <div class="nav-actions">
-            @auth
-            {{-- Cart --}}
-            <a href="{{ route('cart.index') }}" class="nav-icon-btn">
-                <i class="fa-solid fa-cart-shopping"></i>
-                @php $cartCount = count(session('cart', [])); @endphp
-                @if($cartCount > 0)
-                <span class="badge">{{ $cartCount }}</span>
-                @endif
-            </a>
-
-            {{-- User Dropdown --}}
-            <div class="dropdown">
-                <button class="nav-user-btn">
-                    <img src="{{ asset('storage/avatars/' . auth()->user()->avatar) }}" alt="avatar" class="nav-avatar"
-                        onerror="this.src='https://ui-avatars.com/api/?name={{ urlencode(auth()->user()->name) }}&background=1a1a2e&color=e94560&size=40'">
-                    <span>{{ auth()->user()->name }}</span>
-                    <i class="fa-solid fa-chevron-down"></i>
-                </button>
-                <div class="dropdown-menu">
-                    <a href="{{ route('profile.index') }}" class="dropdown-item"><i class="fa-solid fa-user"></i> Profil</a>
-                    <a href="{{ route('orders.index') }}" class="dropdown-item"><i class="fa-solid fa-receipt"></i> Riwayat Transaksi</a>
-                    <a href="{{ route('wishlist.index') }}" class="dropdown-item"><i class="fa-solid fa-heart"></i> Wishlist</a>
-                    @if(auth()->user()->isAdmin())
-                    <div class="dropdown-divider"></div>
-                    <a href="{{ route('admin.dashboard') }}" class="dropdown-item text-accent"><i class="fa-solid fa-gauge"></i> Admin Panel</a>
+            {{-- Nav Actions --}}
+            <div class="nav-actions">
+                @auth
+                {{-- Cart --}}
+                <a href="{{ route('cart.index') }}" class="nav-icon-btn">
+                    <i class="fa-solid fa-cart-shopping"></i>
+                    @php $cartCount = count(session('cart', [])); @endphp
+                    @if($cartCount > 0)
+                    <span class="badge">{{ $cartCount }}</span>
                     @endif
-                    <div class="dropdown-divider"></div>
-                    <form action="{{ route('logout') }}" method="POST">
-                        @csrf
-                        <button type="submit" class="dropdown-item text-danger"><i class="fa-solid fa-right-from-bracket"></i> Logout</button>
-                    </form>
+                </a>
+
+                {{-- User Dropdown --}}
+                <div class="dropdown">
+                    <button class="nav-user-btn">
+                        <img src="{{ auth()->user()->avatar_url }}"
+                             alt="{{ auth()->user()->name }}"
+                             class="nav-avatar">
+                        <span>{{ auth()->user()->name }}</span>
+                        <i class="fa-solid fa-chevron-down"></i>
+                    </button>
+                    <div class="dropdown-menu">
+                        <a href="{{ route('profile.index') }}" class="dropdown-item">
+                            <i class="fa-solid fa-user"></i> Profil
+                        </a>
+                        <a href="{{ route('orders.index') }}" class="dropdown-item">
+                            <i class="fa-solid fa-receipt"></i> Riwayat Transaksi
+                        </a>
+                        <a href="{{ route('wishlist.index') }}" class="dropdown-item">
+                            <i class="fa-solid fa-heart"></i> Wishlist
+                        </a>
+                        @if(auth()->user()->isAdmin())
+                        <div class="dropdown-divider"></div>
+                        <a href="{{ route('admin.dashboard') }}" class="dropdown-item text-accent">
+                            <i class="fa-solid fa-gauge"></i> Admin Panel
+                        </a>
+                        @endif
+                        <div class="dropdown-divider"></div>
+                        <form action="{{ route('logout') }}" method="POST">
+                            @csrf
+                            <button type="submit" class="dropdown-item text-danger">
+                                <i class="fa-solid fa-right-from-bracket"></i> Logout
+                            </button>
+                        </form>
+                    </div>
                 </div>
-            </div>
-            @else
-            <a href="{{ route('login') }}" class="btn btn-outline">Login</a>
-            <a href="{{ route('register') }}" class="btn btn-primary">Daftar</a>
-            @endauth
-        </div>
-        </div>
+                @else
+                <a href="{{ route('login') }}" class="btn btn-outline">Login</a>
+                <a href="{{ route('register') }}" class="btn btn-primary">Daftar</a>
+                @endauth
+            </div>{{-- ✅ Tutup nav-actions --}}
+
+        </div>{{-- ✅ Tutup nav-inner --}}
     </nav>
 
     {{-- Alert Messages --}}
@@ -152,93 +166,110 @@
 
     <script src="{{ asset('js/app.js') }}"></script>
     @stack('scripts')
-<script>
-// ── AJAX Live Search ─────────────────────────────────────
-const searchInput   = document.getElementById('live-search');
-const searchResults = document.getElementById('search-results');
-let searchTimeout   = null;
 
-if (searchInput) {
-    searchInput.addEventListener('input', function () {
-        const q = this.value.trim();
-        clearTimeout(searchTimeout);
+    <script>
+        // Dropdown toggle
+        document.querySelectorAll('.dropdown').forEach(d => {
+            d.querySelector('.nav-user-btn')?.addEventListener('click', e => {
+                e.stopPropagation();
+                d.classList.toggle('open');
+            });
+        });
+        document.addEventListener('click', () => {
+            document.querySelectorAll('.dropdown.open').forEach(d => d.classList.remove('open'));
+        });
 
-        if (q.length < 2) {
-            searchResults.style.display = 'none';
-            searchResults.innerHTML = '';
-            return;
+        // Auto dismiss alert setelah 4 detik
+        setTimeout(() => {
+            document.querySelectorAll('.alert').forEach(el => {
+                el.style.transition = 'opacity 0.5s';
+                el.style.opacity = '0';
+                setTimeout(() => el.remove(), 500);
+            });
+        }, 4000);
+
+        // AJAX Live Search
+        const searchInput   = document.getElementById('live-search');
+        const searchResults = document.getElementById('search-results');
+        let searchTimeout   = null;
+
+        if (searchInput) {
+            searchInput.addEventListener('input', function () {
+                const q = this.value.trim();
+                clearTimeout(searchTimeout);
+
+                if (q.length < 2) {
+                    searchResults.style.display = 'none';
+                    searchResults.innerHTML = '';
+                    return;
+                }
+
+                searchResults.style.display = 'block';
+                searchResults.innerHTML = `
+                    <div style="padding:1rem;text-align:center;color:var(--text-muted);font-size:0.85rem;">
+                        <i class="fa-solid fa-spinner fa-spin"></i> Mencari...
+                    </div>`;
+
+                searchTimeout = setTimeout(() => {
+                    fetch(`/api/games/search?q=${encodeURIComponent(q)}`)
+                        .then(r => r.json())
+                        .then(games => {
+                            if (games.length === 0) {
+                                searchResults.innerHTML = `
+                                    <div style="padding:1rem;text-align:center;color:var(--text-muted);font-size:0.85rem;">
+                                        <i class="fa-solid fa-ghost"></i> Game tidak ditemukan
+                                    </div>`;
+                                return;
+                            }
+
+                            searchResults.innerHTML = games.map(g => `
+                                <a href="/store/${g.slug}"
+                                   style="display:flex;align-items:center;gap:0.75rem;padding:0.65rem 1rem;color:var(--text-primary);text-decoration:none;border-bottom:1px solid var(--border);"
+                                   onmouseover="this.style.background='var(--bg-hover)'"
+                                   onmouseout="this.style.background='transparent'">
+                                    <img src="${g.cover_url}"
+                                         style="width:48px;height:30px;object-fit:cover;border-radius:4px;flex-shrink:0;"
+                                         onerror="this.src='https://via.placeholder.com/48x30/1a1a2e/e94560?text=G'">
+                                    <div style="flex:1;min-width:0;">
+                                        <div style="font-weight:600;font-size:0.9rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
+                                            ${g.title}
+                                        </div>
+                                        <div style="font-size:0.75rem;color:var(--accent);font-family:'Rajdhani',sans-serif;font-weight:700;">
+                                            ${g.price}
+                                        </div>
+                                    </div>
+                                    <i class="fa-solid fa-arrow-right" style="color:var(--text-muted);font-size:0.75rem;flex-shrink:0;"></i>
+                                </a>
+                            `).join('') + `
+                                <a href="/store?search=${encodeURIComponent(q)}"
+                                   style="display:block;padding:0.65rem 1rem;text-align:center;font-size:0.8rem;color:var(--text-secondary);border-top:1px solid var(--border);text-decoration:none;"
+                                   onmouseover="this.style.background='var(--bg-hover)'"
+                                   onmouseout="this.style.background='transparent'">
+                                    Lihat semua hasil untuk "<strong>${q}</strong>"
+                                </a>`;
+                        })
+                        .catch(() => {
+                            searchResults.innerHTML = `
+                                <div style="padding:1rem;text-align:center;color:#ff4757;font-size:0.85rem;">
+                                    <i class="fa-solid fa-circle-xmark"></i> Gagal mencari
+                                </div>`;
+                        });
+                }, 400);
+            });
+
+            document.addEventListener('click', function (e) {
+                if (!document.getElementById('search-wrapper').contains(e.target)) {
+                    searchResults.style.display = 'none';
+                }
+            });
+
+            searchInput.addEventListener('keydown', function (e) {
+                if (e.key === 'Enter' && this.value.trim()) {
+                    window.location.href = `/store?search=${encodeURIComponent(this.value.trim())}`;
+                }
+            });
         }
+    </script>
 
-        // Loading state
-        searchResults.style.display = 'block';
-        searchResults.innerHTML = `
-            <div style="padding:1rem;text-align:center;color:var(--text-muted);font-size:0.85rem;">
-                <i class="fa-solid fa-spinner fa-spin"></i> Mencari...
-            </div>`;
-
-        // Debounce 400ms
-        searchTimeout = setTimeout(() => {
-            fetch(`/api/games/search?q=${encodeURIComponent(q)}`)
-                .then(r => r.json())
-                .then(games => {
-                    if (games.length === 0) {
-                        searchResults.innerHTML = `
-                            <div style="padding:1rem;text-align:center;color:var(--text-muted);font-size:0.85rem;">
-                                <i class="fa-solid fa-ghost"></i> Game tidak ditemukan
-                            </div>`;
-                        return;
-                    }
-
-                    searchResults.innerHTML = games.map(g => `
-                        <a href="/store/${g.slug}"
-                           style="display:flex;align-items:center;gap:0.75rem;padding:0.65rem 1rem;color:var(--text-primary);text-decoration:none;border-bottom:1px solid var(--border);transition:var(--transition);"
-                           onmouseover="this.style.background='var(--bg-hover)'"
-                           onmouseout="this.style.background='transparent'">
-                            <img src="${g.cover_url}"
-                                 style="width:48px;height:30px;object-fit:cover;border-radius:4px;flex-shrink:0;"
-                                 onerror="this.src='https://via.placeholder.com/48x30/1a1a2e/e94560?text=G'">
-                            <div style="flex:1;min-width:0;">
-                                <div style="font-weight:600;font-size:0.9rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
-                                    ${g.title}
-                                </div>
-                                <div style="font-size:0.75rem;color:var(--accent);font-family:'Rajdhani',sans-serif;font-weight:700;">
-                                    ${g.price}
-                                </div>
-                            </div>
-                            <i class="fa-solid fa-arrow-right" style="color:var(--text-muted);font-size:0.75rem;flex-shrink:0;"></i>
-                        </a>
-                    `).join('') + `
-                        <a href="/store?search=${encodeURIComponent(q)}"
-                           style="display:block;padding:0.65rem 1rem;text-align:center;font-size:0.8rem;color:var(--text-secondary);border-top:1px solid var(--border);text-decoration:none;"
-                           onmouseover="this.style.background='var(--bg-hover)'"
-                           onmouseout="this.style.background='transparent'">
-                            Lihat semua hasil untuk "<strong>${q}</strong>"
-                        </a>`;
-                })
-                .catch(() => {
-                    searchResults.innerHTML = `
-                        <div style="padding:1rem;text-align:center;color:#ff4757;font-size:0.85rem;">
-                            <i class="fa-solid fa-circle-xmark"></i> Gagal mencari
-                        </div>`;
-                });
-        }, 400);
-    });
-
-    // Tutup dropdown saat klik di luar
-    document.addEventListener('click', function (e) {
-        if (!document.getElementById('search-wrapper').contains(e.target)) {
-            searchResults.style.display = 'none';
-        }
-    });
-
-    // Tekan Enter → ke halaman store dengan search
-    searchInput.addEventListener('keydown', function (e) {
-        if (e.key === 'Enter' && this.value.trim()) {
-            window.location.href = `/store?search=${encodeURIComponent(this.value.trim())}`;
-        }
-    });
-}
-</script>
 </body>
-
 </html>

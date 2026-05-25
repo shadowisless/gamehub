@@ -13,7 +13,7 @@
     <link rel="stylesheet" href="{{ asset('css/app.css') }}">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     @stack('styles')
-</head>
+</head> 
 
 <body>
 
@@ -24,7 +24,7 @@
                 <i class="fa-solid fa-gamepad"></i> GameHub
             </a>
 
-            <<div class="nav-links">
+            <div class="nav-links">
                 <a href="{{ route('games.index') }}" class="nav-link {{ request()->routeIs('games.*') ? 'active' : '' }}">
                     <i class="fa-solid fa-store"></i> Store
                 </a>

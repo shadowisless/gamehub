@@ -117,3 +117,11 @@ Route::middleware(['auth', 'admin'])
         // Games CRUD
         Route::resource('games', AdminGameController::class);
     });
+
+Route::get('/api/games/search', function(\Illuminate\Http\Request $request) {
+    $games = \App\Models\Game::active()
+        ->where('title', 'like', '%' . $request->q . '%')
+        ->take(5)
+        ->get(['id', 'title', 'price', 'slug']);
+    return response()->json($games);
+})->name('api.games.search');

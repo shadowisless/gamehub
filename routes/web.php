@@ -118,10 +118,20 @@ Route::middleware(['auth', 'admin'])
         Route::resource('games', AdminGameController::class);
     });
 
-Route::get('/api/games/search', function(\Illuminate\Http\Request $request) {
+Route::get('/api/games/search', function (\Illuminate\Http\Request $request) {
     $games = \App\Models\Game::active()
         ->where('title', 'like', '%' . $request->q . '%')
-        ->take(5)
-        ->get(['id', 'title', 'price', 'slug']);
+        ->orWhere('developer', 'like', '%' . $request->q . '%')
+        ->take(6)
+        ->get(['id', 'title', 'price', 'slug', 'cover_image', 'category_id'])
+        ->map(function ($game) {
+            return [
+                'id'        => $game->id,
+                'title'     => $game->title,
+                'price'     => $game->formatted_price,
+                'slug'      => $game->slug,
+                'cover_url' => $game->cover_url,
+            ];
+        });
     return response()->json($games);
 })->name('api.games.search');

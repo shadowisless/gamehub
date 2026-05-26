@@ -245,3 +245,178 @@ select.form-control { cursor: pointer; }
     .hero h1 { font-size: 2.2rem; }
     .games-grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); }
 }
+/* ========================================
+   GAMEHUB - Responsive CSS (Mobile Fix)
+   Tambahkan di bagian bawah public/css/app.css
+   ======================================== */
+
+/* ── Tablet (max 992px) ── */
+@media (max-width: 992px) {
+    .grid-3 { grid-template-columns: repeat(2, 1fr); }
+    .grid-4 { grid-template-columns: repeat(2, 1fr); }
+    .admin-layout { grid-template-columns: 1fr; }
+    .footer-grid { grid-template-columns: 1fr 1fr; }
+
+    /* Detail Game */
+    .game-detail-grid {
+        grid-template-columns: 1fr !important;
+    }
+    .game-action-card {
+        position: static !important;
+    }
+}
+
+/* ── Mobile (max 768px) ── */
+@media (max-width: 768px) {
+    /* Global */
+    .container { padding: 0 1rem; }
+    .section { padding: 1.5rem 0; }
+    .page-hero { padding: 1.5rem 0 1rem; }
+    .page-hero h1 { font-size: 1.4rem; }
+
+    /* Grid */
+    .grid-2 { grid-template-columns: 1fr !important; }
+    .grid-3 { grid-template-columns: 1fr; }
+    .grid-4 { grid-template-columns: repeat(2, 1fr); }
+    .games-grid { grid-template-columns: repeat(2, 1fr); gap: 0.75rem; }
+
+    /* Hero */
+    .hero { padding: 3rem 0; }
+    .hero h1 { font-size: 2rem; }
+    .hero-actions { flex-direction: column; gap: 0.75rem; }
+    .hero-actions .btn { width: 100%; justify-content: center; }
+    .hero::before { display: none; }
+
+    /* Filter Bar */
+    .filter-bar {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+    .filter-bar .form-control,
+    .filter-bar .btn {
+        width: 100%;
+    }
+
+    /* Detail Game */
+    .game-detail-grid {
+        grid-template-columns: 1fr !important;
+        gap: 1rem !important;
+    }
+    .game-action-card {
+        position: static !important;
+        top: auto !important;
+    }
+    .game-price[style*="font-size: 2rem"] {
+        font-size: 1.5rem !important;
+    }
+
+    /* Cart */
+    .cart-item {
+        flex-wrap: wrap;
+        gap: 0.75rem;
+    }
+    .cart-item-img {
+        width: 60px;
+        height: 40px;
+    }
+    .cart-item-info { flex: 1; min-width: 0; }
+    .cart-item-title { font-size: 0.9rem; }
+
+    /* Checkout */
+    .checkout-grid {
+        grid-template-columns: 1fr !important;
+    }
+    .checkout-summary {
+        position: static !important;
+        order: -1;
+    }
+
+    /* Order */
+    .order-info-grid {
+        grid-template-columns: 1fr 1fr !important;
+        gap: 1rem;
+    }
+
+    /* Table - scroll horizontal */
+    .table-responsive {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+    .table { min-width: 500px; }
+
+    /* Forum */
+    .forum-item .card-body {
+        flex-direction: column !important;
+        align-items: flex-start !important;
+        gap: 0.75rem !important;
+    }
+    .forum-item .card-body > img {
+        display: none;
+    }
+    .forum-meta { flex-direction: column; gap: 0.4rem; }
+    .forum-stats {
+        display: flex;
+        gap: 1rem;
+        margin-top: 0.25rem;
+    }
+
+    /* Community Friends */
+    .friends-grid {
+        grid-template-columns: repeat(2, 1fr) !important;
+    }
+
+    /* Admin */
+    .admin-content { padding: 1rem; }
+    .stat-card .stat-value { font-size: 1.5rem; }
+
+    /* Profile */
+    .profile-grid {
+        grid-template-columns: 1fr !important;
+    }
+
+    /* Footer */
+    .footer-grid {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
+
+    /* Section Header */
+    .section-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.75rem;
+    }
+
+    /* Buttons di mobile */
+    .btn-lg { padding: 0.65rem 1.5rem; font-size: 0.95rem; }
+}
+
+/* ── Small Mobile (max 480px) ── */
+@media (max-width: 480px) {
+    .games-grid { grid-template-columns: 1fr; }
+    .grid-4 { grid-template-columns: 1fr; }
+    .hero h1 { font-size: 1.7rem; }
+    .friends-grid { grid-template-columns: 1fr !important; }
+
+    /* Detail Game action buttons */
+    .game-action-buttons {
+        flex-direction: column;
+    }
+
+    /* Alert container */
+    .alert-container {
+        left: 1rem;
+        right: 1rem;
+        max-width: 100%;
+    }
+
+    /* Checkout tipe purchase/gift */
+    .checkout-type-labels {
+        flex-direction: column;
+    }
+
+    /* Order info */
+    .order-info-grid {
+        grid-template-columns: 1fr !important;
+    }
+}

@@ -23,7 +23,6 @@
             cursor: pointer;
             font-size: 1.1rem;
         }
-
         .mobile-menu {
             display: none;
             position: fixed;
@@ -35,7 +34,6 @@
             z-index: 999;
         }
         .mobile-menu.open { display: block; }
-
         .mobile-menu-inner {
             background: var(--bg-secondary);
             border-right: 1px solid var(--border);
@@ -44,7 +42,6 @@
             padding: 1rem 0;
             overflow-y: auto;
         }
-
         .mobile-menu-link {
             display: flex;
             align-items: center;
@@ -74,6 +71,64 @@
         .mobile-menu-user-name { font-weight: 600; color: var(--text-primary); font-size: 0.95rem; }
         .mobile-menu-user-email { font-size: 0.8rem; color: var(--text-muted); }
 
+        /* Live Search */
+        #live-search-wrap { position: relative; margin-left: 0.5rem; }
+        #live-search {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            color: var(--text-primary);
+            padding: 0.4rem 0.85rem;
+            font-family: var(--font-body);
+            font-size: 0.85rem;
+            width: 200px;
+            outline: none;
+            transition: var(--transition);
+        }
+        #live-search:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(233,69,96,0.2);
+        }
+        #live-search::placeholder { color: var(--text-muted); }
+        #search-results {
+            display: none;
+            position: absolute;
+            top: calc(100% + 8px);
+            left: 0;
+            min-width: 300px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            z-index: 9999;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+            overflow: hidden;
+        }
+        .search-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.7rem 1rem;
+            color: var(--text-primary);
+            text-decoration: none;
+            border-bottom: 1px solid var(--border);
+            transition: var(--transition);
+        }
+        .search-item:hover { background: var(--bg-hover); }
+        .search-item-title { font-size: 0.9rem; font-weight: 600; display: flex; align-items: center; gap: 0.5rem; }
+        .search-item-price { color: var(--accent); font-family: var(--font-display); font-size: 0.9rem; font-weight: 700; flex-shrink: 0; margin-left: 0.5rem; }
+        .search-see-all {
+            display: block;
+            padding: 0.65rem 1rem;
+            text-align: center;
+            color: var(--accent);
+            font-size: 0.85rem;
+            text-decoration: none;
+            border-top: 1px solid var(--border);
+            transition: var(--transition);
+        }
+        .search-see-all:hover { background: var(--bg-hover); color: var(--accent); }
+        .search-empty { padding: 1rem; text-align: center; color: var(--text-muted); font-size: 0.85rem; }
+
         @media (max-width: 768px) {
             .nav-links { display: none !important; }
             .nav-actions .btn { display: none; }
@@ -82,8 +137,8 @@
             .nav-menu-toggle { display: flex; }
             .nav-user-btn span { display: none; }
             .nav-user-btn i.fa-chevron-down { display: none; }
+            #live-search-wrap { display: none; }
         }
-
         @media (max-width: 480px) {
             .nav-logo { font-size: 1.2rem; }
             .mobile-menu-inner { width: 100%; }
@@ -93,6 +148,7 @@
 </head>
 <body>
 
+{{-- Navbar --}}
 <nav class="navbar">
     <div class="container nav-inner">
         <a href="{{ route('home') }}" class="nav-logo">
@@ -111,6 +167,12 @@
             <a href="{{ route('community.forum.index') }}" class="nav-link {{ request()->routeIs('community.*') ? 'active' : '' }}">
                 <i class="fa-solid fa-users"></i> Community
             </a>
+
+            {{-- Live Search --}}
+            <div id="live-search-wrap">
+                <input type="text" id="live-search" placeholder="Cari game...">
+                <div id="search-results"></div>
+            </div>
         </div>
 
         <div class="nav-actions">
@@ -122,6 +184,7 @@
                 <span class="badge">{{ $cartCount }}</span>
                 @endif
             </a>
+
             <div class="dropdown">
                 <button class="nav-user-btn">
                     <img src="{{ auth()->user()->avatar_url }}" alt="{{ auth()->user()->name }}" class="nav-avatar">
@@ -129,17 +192,27 @@
                     <i class="fa-solid fa-chevron-down"></i>
                 </button>
                 <div class="dropdown-menu">
-                    <a href="{{ route('profile.index') }}" class="dropdown-item"><i class="fa-solid fa-user"></i> Profil</a>
-                    <a href="{{ route('orders.index') }}" class="dropdown-item"><i class="fa-solid fa-receipt"></i> Riwayat Transaksi</a>
-                    <a href="{{ route('wishlist.index') }}" class="dropdown-item"><i class="fa-solid fa-heart"></i> Wishlist</a>
+                    <a href="{{ route('profile.index') }}" class="dropdown-item">
+                        <i class="fa-solid fa-user"></i> Profil
+                    </a>
+                    <a href="{{ route('orders.index') }}" class="dropdown-item">
+                        <i class="fa-solid fa-receipt"></i> Riwayat Transaksi
+                    </a>
+                    <a href="{{ route('wishlist.index') }}" class="dropdown-item">
+                        <i class="fa-solid fa-heart"></i> Wishlist
+                    </a>
                     @if(auth()->user()->isAdmin())
                     <div class="dropdown-divider"></div>
-                    <a href="{{ route('admin.dashboard') }}" class="dropdown-item text-accent"><i class="fa-solid fa-gauge"></i> Admin Panel</a>
+                    <a href="{{ route('admin.dashboard') }}" class="dropdown-item text-accent">
+                        <i class="fa-solid fa-gauge"></i> Admin Panel
+                    </a>
                     @endif
                     <div class="dropdown-divider"></div>
                     <form action="{{ route('logout') }}" method="POST">
                         @csrf
-                        <button type="submit" class="dropdown-item text-danger"><i class="fa-solid fa-right-from-bracket"></i> Logout</button>
+                        <button type="submit" class="dropdown-item text-danger">
+                            <i class="fa-solid fa-right-from-bracket"></i> Logout
+                        </button>
                     </form>
                 </div>
             </div>
@@ -183,7 +256,9 @@
             <i class="fa-solid fa-cart-shopping"></i> Keranjang
             @php $cartCount = count(session('cart', [])); @endphp
             @if($cartCount > 0)
-            <span style="background:var(--accent);color:#fff;border-radius:999px;padding:0.1rem 0.5rem;font-size:0.7rem;margin-left:auto;">{{ $cartCount }}</span>
+            <span style="background:var(--accent);color:#fff;border-radius:999px;padding:0.1rem 0.5rem;font-size:0.7rem;margin-left:auto;">
+                {{ $cartCount }}
+            </span>
             @endif
         </a>
         @endauth
@@ -220,8 +295,12 @@
         @else
         <hr class="mobile-menu-divider">
         <div style="padding:1rem 1.5rem;display:flex;flex-direction:column;gap:0.75rem;">
-            <a href="{{ route('login') }}" class="btn btn-outline btn-block"><i class="fa-solid fa-right-to-bracket"></i> Login</a>
-            <a href="{{ route('register') }}" class="btn btn-primary btn-block"><i class="fa-solid fa-user-plus"></i> Daftar</a>
+            <a href="{{ route('login') }}" class="btn btn-outline btn-block">
+                <i class="fa-solid fa-right-to-bracket"></i> Login
+            </a>
+            <a href="{{ route('register') }}" class="btn btn-primary btn-block">
+                <i class="fa-solid fa-user-plus"></i> Daftar
+            </a>
         </div>
         @endauth
     </div>
@@ -240,10 +319,12 @@
     @endforeach
 </div>
 
+{{-- Main Content --}}
 <main class="main-content">
     @yield('content')
 </main>
 
+{{-- Footer --}}
 <footer class="footer">
     <div class="container">
         <div class="footer-grid">
@@ -283,8 +364,9 @@
 </footer>
 
 @stack('scripts')
+
 <script>
-// Dropdown Desktop
+// ── Dropdown Desktop ─────────────────────────────────────
 document.querySelectorAll('.dropdown').forEach(d => {
     d.querySelector('.nav-user-btn')?.addEventListener('click', e => {
         e.stopPropagation();
@@ -295,32 +377,110 @@ document.addEventListener('click', () => {
     document.querySelectorAll('.dropdown.open').forEach(d => d.classList.remove('open'));
 });
 
-// Mobile Menu
+// ── Mobile Menu ──────────────────────────────────────────
 const menuToggle = document.getElementById('menu-toggle');
 const mobileMenu = document.getElementById('mobile-menu');
 const menuIcon   = document.getElementById('menu-icon');
 
-menuToggle.addEventListener('click', (e) => {
-    e.stopPropagation();
-    const isOpen = mobileMenu.classList.toggle('open');
-    menuIcon.className = isOpen ? 'fa-solid fa-xmark' : 'fa-solid fa-bars';
-});
-
-mobileMenu.addEventListener('click', (e) => {
-    if (e.target === mobileMenu) {
-        mobileMenu.classList.remove('open');
-        menuIcon.className = 'fa-solid fa-bars';
-    }
-});
-
-document.querySelectorAll('.mobile-menu-link').forEach(link => {
-    link.addEventListener('click', () => {
-        mobileMenu.classList.remove('open');
-        menuIcon.className = 'fa-solid fa-bars';
+if (menuToggle) {
+    menuToggle.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const isOpen = mobileMenu.classList.toggle('open');
+        menuIcon.className = isOpen ? 'fa-solid fa-xmark' : 'fa-solid fa-bars';
     });
-});
 
-// Auto dismiss alert
+    mobileMenu.addEventListener('click', (e) => {
+        if (e.target === mobileMenu) {
+            mobileMenu.classList.remove('open');
+            menuIcon.className = 'fa-solid fa-bars';
+        }
+    });
+
+    document.querySelectorAll('.mobile-menu-link').forEach(link => {
+        link.addEventListener('click', () => {
+            mobileMenu.classList.remove('open');
+            menuIcon.className = 'fa-solid fa-bars';
+        });
+    });
+}
+
+// ── AJAX Live Search ─────────────────────────────────────
+const liveSearch    = document.getElementById('live-search');
+const searchResults = document.getElementById('search-results');
+
+if (liveSearch && searchResults) {
+    let searchTimeout = null;
+
+    liveSearch.addEventListener('input', function () {
+        const q = this.value.trim();
+        clearTimeout(searchTimeout);
+
+        if (q.length < 2) {
+            searchResults.style.display = 'none';
+            searchResults.innerHTML = '';
+            return;
+        }
+
+        searchTimeout = setTimeout(() => {
+            searchResults.style.display = 'block';
+            searchResults.innerHTML = `
+                <div class="search-empty">
+                    <i class="fa-solid fa-spinner fa-spin"></i> Mencari...
+                </div>`;
+
+            fetch(`/api/games/search?q=${encodeURIComponent(q)}`)
+                .then(r => r.json())
+                .then(games => {
+                    if (games.length === 0) {
+                        searchResults.innerHTML = `
+                            <div class="search-empty">
+                                <i class="fa-solid fa-ghost"></i> Game tidak ditemukan
+                            </div>`;
+                        return;
+                    }
+
+                    const items = games.map(g => `
+                        <a href="/store/${g.slug}" class="search-item">
+                            <div class="search-item-title">
+                                <i class="fa-solid fa-gamepad" style="color:var(--accent);font-size:0.8rem;"></i>
+                                ${g.title}
+                            </div>
+                            <span class="search-item-price">
+                                ${parseInt(g.price) === 0 ? 'GRATIS' : 'Rp ' + parseInt(g.price).toLocaleString('id-ID')}
+                            </span>
+                        </a>
+                    `).join('');
+
+                    const seeAll = `
+                        <a href="/store?search=${encodeURIComponent(q)}" class="search-see-all">
+                            Lihat semua hasil untuk "${q}" <i class="fa-solid fa-arrow-right"></i>
+                        </a>`;
+
+                    searchResults.innerHTML = items + seeAll;
+                })
+                .catch(() => {
+                    searchResults.innerHTML = `
+                        <div class="search-empty">
+                            <i class="fa-solid fa-circle-exclamation"></i> Gagal memuat hasil
+                        </div>`;
+                });
+        }, 300);
+    });
+
+    liveSearch.addEventListener('focus', function () {
+        if (this.value.trim().length >= 2 && searchResults.innerHTML !== '') {
+            searchResults.style.display = 'block';
+        }
+    });
+
+    document.addEventListener('click', (e) => {
+        if (!e.target.closest('#live-search-wrap')) {
+            searchResults.style.display = 'none';
+        }
+    });
+}
+
+// ── Auto Dismiss Alert ───────────────────────────────────
 setTimeout(() => {
     document.querySelectorAll('.alert').forEach(el => {
         el.style.transition = 'opacity 0.5s';
@@ -329,5 +489,6 @@ setTimeout(() => {
     });
 }, 4000);
 </script>
+
 </body>
 </html>
